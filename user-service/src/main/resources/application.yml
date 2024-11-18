@@ -6,7 +6,6 @@ spring:
   cloud:
     config:
       name: service
-      pro
 
 eureka:
   client:
