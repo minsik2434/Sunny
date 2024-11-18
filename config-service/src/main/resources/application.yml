@@ -5,7 +5,9 @@ spring:
     config:
       server:
         git:
-          uri:
+          uri: https://github.com/minsik2434/Sunny.git
+          default-label: config-service
+          search-paths: resource/
 
 server:
   port: 8888

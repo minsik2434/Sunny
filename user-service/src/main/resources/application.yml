@@ -1,6 +1,13 @@
 spring:
   application:
     name: user-service
+  config:
+    import: optional:configserver:http://localhost:8888
+  cloud:
+    config:
+      name: service
+      pro
+
 eureka:
   client:
     register-with-eureka: true
