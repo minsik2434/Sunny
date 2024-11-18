@@ -1,2 +1,8 @@
+#encrypt:
+#  key: random_text_abcdefg
 encrypt:
-  key: random_text_abcdefg
+  key-store:
+    location: file:/Users/choiminsik/Desktop/문서/keystore/server.jks
+    password: test123
+    alias: mykey
+    secret: test123
