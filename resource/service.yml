@@ -1,2 +1,3 @@
 test:
-  value: test-value
+  # value: test-value
+  value: "{cipher}e2913b95d5df41d98e2e9a9cc19d68fe70ffa058bcee884067e7652255a50087"

@@ -8,6 +8,6 @@ spring:
           uri: https://github.com/minsik2434/Sunny.git
           default-label: develop
           search-paths: resource/
-
 server:
   port: 8888
+
