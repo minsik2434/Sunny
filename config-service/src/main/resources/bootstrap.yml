@@ -1,13 +1,6 @@
 encrypt:
   key-store:
-    location: file:/Users/choiminsik/Desktop/문서/keystore/publickey.jks
+    location: file:/Users/choiminsik/Desktop/문서/keystore/privateKey.jks
     password: minsik
     alias: mykey
-    secret: minsik
 
-#spring:
-#  cloud:
-#    config:
-#      server:
-#        encrypt:
-#          enabled: false
