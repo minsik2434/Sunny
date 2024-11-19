@@ -1,6 +1,6 @@
 spring:
   datasource:
-  driver-class-name: com.mysql.cj.jdbc.Driver
-  url: jdbc:mysql://localhost:3306/sunny_user
-  username: root
-  password: "{cipher}AQAUh8VHY8+dtc4krEXCoORza7gus/W/EfpniRgUUhTcNk8WuGiDj/RooNSxGmW+gopLBGoIl3Q4x5gs78lDZ4Q1K9ec0ZuzVMYXpFBqEnQy02K2RYx37P7QEQKPIvcuvZLMudV5Z9rLk9zLHWtEOCABkv+TgL2G1ZhG24zCuFQKNtazwietj6rCAQtSJnEyJBEFjWz6w3VAiReAfypkxMXnG6olEsdvHr9+XMosn+mj9zF/Ox9H2vOxjFwWU96P3kxWqFjob1QolEwg40jvA8/vZZzxeUuxyz1SG3N/a9XreqLuFnoUGIHHdmGADbd/GOh3VaKSq7+L70vaUxFA57vi4V5hYhQ5JredPDQJIJRYYhT8Dd/nD6sw3YrlZM+kIqI="
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/sunny_user
+    username: root
+    password: "{cipher}AQAUh8VHY8+dtc4krEXCoORza7gus/W/EfpniRgUUhTcNk8WuGiDj/RooNSxGmW+gopLBGoIl3Q4x5gs78lDZ4Q1K9ec0ZuzVMYXpFBqEnQy02K2RYx37P7QEQKPIvcuvZLMudV5Z9rLk9zLHWtEOCABkv+TgL2G1ZhG24zCuFQKNtazwietj6rCAQtSJnEyJBEFjWz6w3VAiReAfypkxMXnG6olEsdvHr9+XMosn+mj9zF/Ox9H2vOxjFwWU96P3kxWqFjob1QolEwg40jvA8/vZZzxeUuxyz1SG3N/a9XreqLuFnoUGIHHdmGADbd/GOh3VaKSq7+L70vaUxFA57vi4V5hYhQ5JredPDQJIJRYYhT8Dd/nD6sw3YrlZM+kIqI="
