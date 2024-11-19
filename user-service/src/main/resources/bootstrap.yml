@@ -1,0 +1,6 @@
+encrypt:
+  key-store:
+    location: file:/Users/choiminsik/Desktop/문서/keystore/server.jks
+    password: minsik
+    alias: mykey
+    secret: test
