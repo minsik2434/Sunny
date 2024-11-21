@@ -1,10 +1,7 @@
 package com.sunny.userservice.domain;
 
 import com.sunny.userservice.dto.UserRequestDto;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,9 +15,12 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
     private String email;
     private String password;
     private String name;
+
+    @Column(unique = true)
     private String phoneNumber;
     private String profileUrl;
 

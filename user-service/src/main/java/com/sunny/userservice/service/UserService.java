@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface UserService {
     void save(UserRequestDto userRequestDto);
-    UserResponseDto getUser(String userId);
+    UserResponseDto getUser(String email);
 }

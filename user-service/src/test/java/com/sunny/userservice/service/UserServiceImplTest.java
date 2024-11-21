@@ -1,8 +1,10 @@
 package com.sunny.userservice.service;
 
 import com.sunny.userservice.common.exception.DuplicateResourceException;
+import com.sunny.userservice.common.exception.ResourceNotFoundException;
 import com.sunny.userservice.domain.Member;
 import com.sunny.userservice.dto.UserRequestDto;
+import com.sunny.userservice.dto.UserResponseDto;
 import com.sunny.userservice.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
@@ -13,11 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @Slf4j
-class MemberServiceImplTest {
+class UserServiceImplTest {
 
     @Autowired
     UserService userService;
@@ -54,6 +58,29 @@ class MemberServiceImplTest {
     void saveTest_DuplicateEmail(){
         userService.save(userRequestDto);
         assertThatThrownBy(()->userService.save(userRequestDto)).isInstanceOf(DuplicateResourceException.class);
+    }
+
+    @Test
+    @DisplayName("회원 조회 테스트")
+    void getUserTest(){
+        userService.save(userRequestDto);
+
+        Member member = userRepository.findByEmail(userRequestDto.getEmail()).get();
+        UserResponseDto userResponseDto = userService.getUser(userRequestDto.getEmail());
+
+        assertThat(member.getId()).isEqualTo(userResponseDto.getId());
+        assertThat(member.getEmail()).isEqualTo(userResponseDto.getEmail());
+        assertThat(member.getName()).isEqualTo(userResponseDto.getName());
+        assertThat(member.getPhoneNumber()).isEqualTo(userResponseDto.getPhoneNumber());
+        assertThat(member.getProfileUrl()).isEqualTo(userResponseDto.getProfileUrl());
+
+    }
+
+    @Test
+    @DisplayName("회원 조회 테스트 - 존재하지 않는 회원")
+    void getUserTest_NotFound(){
+        assertThatThrownBy(()-> userService.getUser(userRequestDto.getEmail()))
+                .isInstanceOf(ResourceNotFoundException.class);
     }
 
     private void checkSaveMember(Member member){
