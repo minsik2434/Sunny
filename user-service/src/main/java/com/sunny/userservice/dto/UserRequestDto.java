@@ -1,4 +1,4 @@
-package com.sunny.userservice.domain.dto;
+package com.sunny.userservice.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

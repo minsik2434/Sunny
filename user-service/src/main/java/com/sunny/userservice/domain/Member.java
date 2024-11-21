@@ -1,6 +1,6 @@
 package com.sunny.userservice.domain;
 
-import com.sunny.userservice.domain.dto.UserRequestDto;
+import com.sunny.userservice.dto.UserRequestDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
