@@ -115,15 +115,4 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.path").value("/user/email"));
     }
 
-    @Test
-    @DisplayName("회원 로그인 - 성공")
-    void loginTest(){
-
-    }
-
-    @Test
-    @DisplayName("회원 로그인 - 실패")
-    void loginTest_Fail(){
-
-    }
 }
