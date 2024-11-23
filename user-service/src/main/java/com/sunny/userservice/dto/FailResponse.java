@@ -1,11 +1,13 @@
 package com.sunny.userservice.dto;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.http.HttpStatus;
 
 @Setter
 @Getter
+@Builder
 public class FailResponse {
     private HttpStatus status;
     private String error;

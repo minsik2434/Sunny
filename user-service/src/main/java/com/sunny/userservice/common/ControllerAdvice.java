@@ -33,13 +33,12 @@ public class ControllerAdvice {
     }
 
     private FailResponse createFailResponse(HttpStatus status, String error, String message, String requestUrl){
-        FailResponse failResponse = new FailResponse();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-        failResponse.setStatus(status);
-        failResponse.setError(error);
-        failResponse.setMessage(message);
-        failResponse.setDateTime(dateFormat.format(System.currentTimeMillis()));
-        failResponse.setPath(requestUrl);
-        return failResponse;
+        return FailResponse.builder()
+                .status(status)
+                .error(error)
+                .message(message)
+                .dateTime(dateFormat.format(System.currentTimeMillis()))
+                .path(requestUrl).build();
     }
 }

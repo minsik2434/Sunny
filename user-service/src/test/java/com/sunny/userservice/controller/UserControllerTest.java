@@ -11,11 +11,18 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -23,6 +30,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(UserController.class)
 class UserControllerTest {
+
+    @TestConfiguration
+    static class SecurityConfig {
+        @Bean
+        public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+            http.csrf(AbstractHttpConfigurer::disable);
+            return http.build();
+        }
+    }
     UserRequestDto userRequestDto;
     @Autowired
     MockMvc mockMvc;
@@ -38,7 +54,7 @@ class UserControllerTest {
                 "010-2434-4402");
     }
     @Test
-    @DisplayName("회원 저장 컨트롤러 테스트")
+    @DisplayName("회원 저장")
     void createUserTest() throws Exception {
         doNothing().when(userService).save(any(UserRequestDto.class));
         ObjectMapper mapper = new ObjectMapper();
@@ -50,7 +66,7 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("회원 저장 컨트롤러 테스트 - 동일한 이메일 존재시")
+    @DisplayName("회원 저장 - 동일한 이메일 존재시")
     void createUserTest_DuplicateEmail() throws Exception {
         doThrow(new DuplicateResourceException("This is a duplicate resource"))
                 .when(userService).save(any(UserRequestDto.class));
@@ -97,5 +113,17 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.error").value("Not Found"))
                 .andExpect(jsonPath("$.message").value("user not found"))
                 .andExpect(jsonPath("$.path").value("/user/email"));
+    }
+
+    @Test
+    @DisplayName("회원 로그인 - 성공")
+    void loginTest(){
+
+    }
+
+    @Test
+    @DisplayName("회원 로그인 - 실패")
+    void loginTest_Fail(){
+
     }
 }
