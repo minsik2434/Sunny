@@ -5,6 +5,7 @@ import com.sunny.userservice.dto.TokenResponseDto;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -36,6 +37,7 @@ class LoginSuccessHandlerTest {
     private LoginSuccessHandler loginSuccessHandler;
 
     @Test
+    @DisplayName("로그인 성공시 응답 테스트")
     void onAuthenticationSuccessTest() throws IOException, ServletException {
         //사용자 이메일
         String email = "testEmail@naver.com";
@@ -70,5 +72,4 @@ class LoginSuccessHandlerTest {
         assertThat(responseBody).contains("accessToken");
         assertThat(responseBody).contains("refreshToken");
     }
-
 }
