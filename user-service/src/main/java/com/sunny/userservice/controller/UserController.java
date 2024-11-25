@@ -27,4 +27,9 @@ public class UserController {
         UserResponseDto userResponseDto = userService.getUser(userEmail);
         return ResponseEntity.ok(userResponseDto);
     }
+
+    @GetMapping("/check")
+    public String check(){
+        return "check";
+    }
 }
