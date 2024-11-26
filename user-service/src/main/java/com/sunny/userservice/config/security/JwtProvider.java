@@ -10,9 +10,8 @@ import java.security.Key;
 import java.util.Date;
 
 public class JwtProvider {
-    private static final long ISSUE_AT = System.currentTimeMillis();
-    private static final long ACCESS_TOKEN_EXPIRATION_TIME = ISSUE_AT + 3600000;
-    private static final long REFRESH_TOKEN_EXPIRATION_TIME = ISSUE_AT + 80000000;
+    private static final long ACCESS_TOKEN_EXPIRATION_TIME = 3600000;
+    private static final long REFRESH_TOKEN_EXPIRATION_TIME = 80000000;
 
     private final Key key;
     public JwtProvider(String keyString){
@@ -21,27 +20,29 @@ public class JwtProvider {
     }
 
     public TokenResponseDto createToken(String claim){
-        String accessToken = genAccessToken(claim);
-        String refreshToken = genRefreshToken(claim);
+        long now = System.currentTimeMillis();
+        String accessToken = genAccessToken(claim, now);
+        String refreshToken = genRefreshToken(claim, now);
         return TokenResponseDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken).build();
     }
-    private String genAccessToken(String claim){
+    private String genAccessToken(String claim, long now){
         return Jwts.builder()
                     .setSubject("AccessToken")
                     .claim("user_email", claim)
-                    .setIssuedAt(new Date(ISSUE_AT))
-                    .setExpiration(new Date(ACCESS_TOKEN_EXPIRATION_TIME))
+                    .setIssuedAt(new Date(now))
+                    .setExpiration(new Date(now + ACCESS_TOKEN_EXPIRATION_TIME))
                     .signWith(key, SignatureAlgorithm.HS256)
                     .compact();
     }
-    private String genRefreshToken(String claim){
+    private String genRefreshToken(String claim ,long now){
+
         return Jwts.builder()
                     .setSubject("RefreshToken")
                     .claim("user_email", claim)
-                    .setIssuedAt(new Date(ISSUE_AT))
-                    .setExpiration(new Date(REFRESH_TOKEN_EXPIRATION_TIME))
+                    .setIssuedAt(new Date(now))
+                    .setExpiration(new Date(now + REFRESH_TOKEN_EXPIRATION_TIME))
                     .signWith(key, SignatureAlgorithm.HS256)
                     .compact();
     }
