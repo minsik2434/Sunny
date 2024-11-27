@@ -1,7 +1,6 @@
-package com.sunny.userservice.config.security;
+package com.sunny.userservice.common;
 
 import com.sunny.userservice.dto.TokenResponseDto;
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;

@@ -1,5 +1,7 @@
 package com.sunny.userservice.controller;
 
+import com.sunny.userservice.dto.LoginRequestDto;
+import com.sunny.userservice.dto.TokenResponseDto;
 import com.sunny.userservice.dto.UserRequestDto;
 import com.sunny.userservice.dto.UserResponseDto;
 import com.sunny.userservice.service.UserService;
@@ -27,6 +29,18 @@ public class UserController {
         UserResponseDto userResponseDto = userService.getUser(userEmail);
         return ResponseEntity.ok(userResponseDto);
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<TokenResponseDto> login(@RequestBody LoginRequestDto loginRequestDto){
+        TokenResponseDto token = userService.login(loginRequestDto);
+        return ResponseEntity.ok(token);
+    }
+
+    @GetMapping("/logout/{userEmail}")
+    public ResponseEntity<UserResponseDto> logout(@PathVariable String userEmail){
+        return null;
+    }
+
 
     @GetMapping("/check")
     public String check(){

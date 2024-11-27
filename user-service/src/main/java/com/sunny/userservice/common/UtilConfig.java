@@ -1,4 +1,4 @@
-package com.sunny.userservice.config.security;
+package com.sunny.userservice.common;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

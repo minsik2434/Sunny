@@ -1,5 +1,6 @@
 package com.sunny.userservice.common;
 
+import com.sunny.userservice.common.exception.CredentialException;
 import com.sunny.userservice.common.exception.DuplicateResourceException;
 import com.sunny.userservice.common.exception.ResourceNotFoundException;
 import com.sunny.userservice.dto.FailResponse;
@@ -13,6 +14,16 @@ import java.text.SimpleDateFormat;
 
 @RestControllerAdvice
 public class ControllerAdvice {
+
+    @ExceptionHandler(CredentialException.class)
+    public ResponseEntity<FailResponse> credentialExceptionResponse(CredentialException ex,
+                                                                    HttpServletRequest request){
+        FailResponse failResponse = createFailResponse(HttpStatus.UNAUTHORIZED, "UnAuthorization",
+                ex.getMessage(),
+                request.getRequestURI());
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(failResponse);
+    }
     @ExceptionHandler(DuplicateResourceException.class)
     public ResponseEntity<FailResponse> duplicateExceptionResponse(DuplicateResourceException ex,
                                                                    HttpServletRequest request){

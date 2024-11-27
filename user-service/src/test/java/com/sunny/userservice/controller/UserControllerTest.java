@@ -1,8 +1,13 @@
 package com.sunny.userservice.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sunny.userservice.common.JwtProvider;
+import com.sunny.userservice.common.exception.CredentialException;
 import com.sunny.userservice.common.exception.DuplicateResourceException;
 import com.sunny.userservice.common.exception.ResourceNotFoundException;
+import com.sunny.userservice.dto.LoginRequestDto;
+import com.sunny.userservice.dto.TokenResponseDto;
 import com.sunny.userservice.dto.UserRequestDto;
 import com.sunny.userservice.dto.UserResponseDto;
 import com.sunny.userservice.service.UserService;
@@ -11,18 +16,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -30,21 +28,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(UserController.class)
 class UserControllerTest {
-
-    @TestConfiguration
-    static class SecurityConfig {
-        @Bean
-        public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-            http.csrf(AbstractHttpConfigurer::disable);
-            return http.build();
-        }
-    }
+    ObjectMapper mapper = new ObjectMapper();
     UserRequestDto userRequestDto;
+    LoginRequestDto loginRequestDto;
     @Autowired
     MockMvc mockMvc;
 
     @MockBean
     UserService userService;
+
+    @MockBean
+    JwtProvider jwtProvider;
     @BeforeEach
     void userInit(){
         userRequestDto = new UserRequestDto(
@@ -52,12 +46,14 @@ class UserControllerTest {
                 "tesPassword",
                 "user1",
                 "010-2434-4402");
+        loginRequestDto = new LoginRequestDto();
+        loginRequestDto.setEmail("testEmail");
+        loginRequestDto.setPassword("testPassword");
     }
     @Test
     @DisplayName("회원 저장")
     void createUserTest() throws Exception {
         doNothing().when(userService).save(any(UserRequestDto.class));
-        ObjectMapper mapper = new ObjectMapper();
         String requestBody = mapper.writeValueAsString(userRequestDto);
         mockMvc.perform(post("/user")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -71,7 +67,7 @@ class UserControllerTest {
         doThrow(new DuplicateResourceException("This is a duplicate resource"))
                 .when(userService).save(any(UserRequestDto.class));
 
-        ObjectMapper mapper = new ObjectMapper();
+
         String requestBody = mapper.writeValueAsString(userRequestDto);
         mockMvc.perform(post("/user")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -113,6 +109,48 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.error").value("Not Found"))
                 .andExpect(jsonPath("$.message").value("user not found"))
                 .andExpect(jsonPath("$.path").value("/user/email"));
+    }
+
+    @Test
+    @DisplayName("회원 로그인")
+    void loginTest() throws Exception {
+        String requestBody = mapper.writeValueAsString(loginRequestDto);
+        TokenResponseDto tokenResponseDto = TokenResponseDto.builder()
+                                .accessToken("accessToken")
+                                .refreshToken("refreshToken")
+                                .build();
+
+        when(jwtProvider.createToken(anyString())).thenReturn(tokenResponseDto);
+        when(userService.login(any(LoginRequestDto.class))).thenReturn(tokenResponseDto);
+
+        mockMvc.perform(post("/login")
+                        .contentType("application/json")
+                        .content(requestBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").value(tokenResponseDto.getAccessToken()))
+                .andExpect(jsonPath("$.refreshToken").value(tokenResponseDto.getRefreshToken()));
+    }
+
+    @Test
+    @DisplayName("회원 로그인 - 로그인 실패")
+    void loginTest_fail() throws Exception {
+        String requestBody = mapper.writeValueAsString(loginRequestDto);
+        doThrow(new CredentialException("Email or Password Incorrect"))
+                .when(userService).login(any(LoginRequestDto.class));
+
+        mockMvc.perform(post("/login")
+                        .contentType("application/json")
+                        .content(requestBody))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.error").value("UnAuthorization"))
+                .andExpect(jsonPath("$.message").value("Email or Password Incorrect"))
+                .andExpect(jsonPath("$.path").value("/login"));
+    }
+
+    @Test
+    @DisplayName("회원 로그아웃")
+    void logoutTest(){
+
     }
 
 }
