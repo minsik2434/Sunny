@@ -4,3 +4,12 @@ spring:
     url: jdbc:mysql://localhost:3306/sunny_user
     username: root
     password: "{cipher}AQAUh8VHY8+dtc4krEXCoORza7gus/W/EfpniRgUUhTcNk8WuGiDj/RooNSxGmW+gopLBGoIl3Q4x5gs78lDZ4Q1K9ec0ZuzVMYXpFBqEnQy02K2RYx37P7QEQKPIvcuvZLMudV5Z9rLk9zLHWtEOCABkv+TgL2G1ZhG24zCuFQKNtazwietj6rCAQtSJnEyJBEFjWz6w3VAiReAfypkxMXnG6olEsdvHr9+XMosn+mj9zF/Ox9H2vOxjFwWU96P3kxWqFjob1QolEwg40jvA8/vZZzxeUuxyz1SG3N/a9XreqLuFnoUGIHHdmGADbd/GOh3VaKSq7+L70vaUxFA57vi4V5hYhQ5JredPDQJIJRYYhT8Dd/nD6sw3YrlZM+kIqI="
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+jwt:
+  secret: "{cipher}AQCFjj2xM1aL6yuMQnQQGk60LBTaDu7bAfAWd7qJLh/RFfOE+4t0rvv4VeT/x9uNl9476TiRJDcxHticcp+T+sibZnQhjHIRLE3CUEk2vhCECpR7smmABtBhjHRPTFJfTUR05V8CLbbFyg/FGQJsW+aaARjzpb73/eU+dHUNkZaGs/hwz4HAUup5NNb5o1LJxzjkusuKjuxQEVeOu8MqJ+ofU10/7YHcJpCNUE21cVwPm9WXNsFd+HMYKyPmav+WlKS8be9V97NZTwW1JgeMSoszkonW1eVcguH1ouSCB7kZkpUZAr4oXqRPrULDFDVsSPtGJbLxFOAljY1eF+FPupNRgONi/0xy/W/IyGOdOBurE2ErqDiBoOPPcUuQsiHI8wjTukPcHhx91JdvvGfeyJw3CvieWTXiBuMzdZGvJAalFfazMGS5kYYenzrfgEgPeZ7jXlDZBimqbKn2GHQm+DCn9OAl80b++q2o37xZ6DqroHx/k2aon2EppdBPCOqVIvo="
+  access-token-expiration: 3600000
+  refresh-token-expiration: 604800000
