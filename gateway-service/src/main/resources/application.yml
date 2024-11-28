@@ -1,7 +1,11 @@
 spring:
   application:
     name: gateway-service
+  config:
+    import: optional:configserver:http://localhost:8888
   cloud:
+    config:
+      name: gateway-service
     gateway:
       routes:
         - id: user-service
@@ -23,9 +27,6 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://localhost:8761/eureka
-
-jwt:
-  secret: aslkdnbvapdcnvakldsvfalwkr0134dakfdsakjb2152ereonfp1nf1idnvpasclvkxcv
 
 server:
   port: 8000
