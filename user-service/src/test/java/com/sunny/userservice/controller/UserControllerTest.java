@@ -149,8 +149,56 @@ class UserControllerTest {
 
     @Test
     @DisplayName("회원 로그아웃")
-    void logoutTest(){
+    void logoutTest() throws Exception {
+        doNothing().when(userService).logout(anyString());
 
+        mockMvc.perform(get("/logout/email"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("리프레시")
+    void refreshTest() throws Exception {
+        TokenResponseDto tokenResponseDto = TokenResponseDto.builder()
+                .accessToken("access")
+                .refreshToken("refresh").build();
+
+        when(userService.refresh(anyString())).thenReturn(tokenResponseDto);
+
+        mockMvc.perform(post("/refresh")
+                .contentType("application/json")
+                .header("Authorization", "Bearer testToken"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").value("access"))
+                .andExpect(jsonPath("$.refreshToken").value("refresh"));
+    }
+
+    @Test
+    @DisplayName("리프레시 - 리프레시 토큰이 일치하지 않을때")
+    void refreshTest_notMatch() throws Exception {
+        doThrow(new CredentialException("RefreshToken Not Matched")).when(userService).refresh(anyString());
+
+        mockMvc.perform(post("/refresh")
+                .contentType("application/json")
+                .header("Authorization","Bearer testToken"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.error").value("UnAuthorization"))
+                .andExpect(jsonPath("$.message").value("RefreshToken Not Matched"))
+                .andExpect(jsonPath("$.path").value("/refresh"));
+    }
+
+    @Test
+    @DisplayName("리프레시 - 리프레시 토큰을 찾을 수 없을때")
+    void refreshTest_noData() throws Exception {
+        doThrow(new ResourceNotFoundException("RefreshToken Not Found")).when(userService).refresh(anyString());
+
+        mockMvc.perform(post("/refresh")
+                        .contentType("application/json")
+                        .header("Authorization","Bearer testToken"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("Not Found"))
+                .andExpect(jsonPath("$.message").value("RefreshToken Not Found"))
+                .andExpect(jsonPath("$.path").value("/refresh"));
     }
 
 }

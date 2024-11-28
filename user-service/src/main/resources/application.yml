@@ -30,3 +30,5 @@ server:
 
 jwt:
   secret: aslkdnbvapdcnvakldsvfalwkr0134dakfdsakjb2152ereonfp1nf1idnvpasclvkxcv
+  access-token-expiration: 3600000
+  refresh-token-expiration: 604800000

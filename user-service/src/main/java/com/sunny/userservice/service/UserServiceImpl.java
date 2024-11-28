@@ -14,11 +14,17 @@ import lombok.RequiredArgsConstructor;
 //import org.springframework.security.core.userdetails.User;
 //import org.springframework.security.core.userdetails.UserDetails;
 //import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +33,10 @@ public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final RedisTemplate<String,String> redisTemplate;
+
+    @Value("${jwt.refresh-token-expiration}")
+    private long refresh_token_expirationTime;
 
     @Transactional
     @Override
@@ -82,7 +92,30 @@ public class UserServiceImpl implements UserService{
         if(!passwordEncoder.matches(loginRequestDto.getPassword(),encryptPassword)){
             throw new CredentialException("Email or Password Incorrect");
         }
+        TokenResponseDto token = jwtProvider.createToken(email);
+        ValueOperations<String, String> vop = redisTemplate.opsForValue();
+        vop.set(email, token.getRefreshToken(), refresh_token_expirationTime, TimeUnit.MILLISECONDS);
+        return token;
+    }
 
-        return jwtProvider.createToken(email);
+    @Override
+    public void logout(String email) {
+        redisTemplate.delete(email);
+    }
+
+    @Override
+    public TokenResponseDto refresh(String refreshToken) {
+        String email = jwtProvider.getClaim(refreshToken);
+        ValueOperations<String, String> vop = redisTemplate.opsForValue();
+        String savedRefreshToken = vop.get(email);
+        if(savedRefreshToken == null){
+            throw new ResourceNotFoundException("RefreshToken Not Found");
+        }
+        else if(!refreshToken.equals(savedRefreshToken)){
+            throw new CredentialException("RefreshToken Not Matched");
+        }
+        TokenResponseDto token = jwtProvider.createToken(email);
+        vop.set(email,token.getRefreshToken());
+        return token;
     }
 }

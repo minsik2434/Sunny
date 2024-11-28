@@ -38,10 +38,16 @@ public class UserController {
 
     @GetMapping("/logout/{userEmail}")
     public ResponseEntity<UserResponseDto> logout(@PathVariable String userEmail){
-        return null;
+        userService.logout(userEmail);
+        return ResponseEntity.noContent().build();
     }
 
-
+    @PostMapping("/refresh")
+    public ResponseEntity<TokenResponseDto> refresh(@RequestHeader("Authorization") String refreshToken){
+        String token = refreshToken.replace("Bearer ", "");
+        TokenResponseDto refresh = userService.refresh(token);
+        return ResponseEntity.ok(refresh);
+    }
     @GetMapping("/check")
     public String check(){
         return "check";

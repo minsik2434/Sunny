@@ -5,12 +5,17 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+
 import java.security.Key;
 import java.util.Date;
 
 public class JwtProvider {
-    private static final long ACCESS_TOKEN_EXPIRATION_TIME = 3600000;
-    private static final long REFRESH_TOKEN_EXPIRATION_TIME = 80000000;
+    @Value("${jwt.access-token-expiration}")
+    private long ACCESS_TOKEN_EXPIRATION_TIME;
+
+    @Value("${jwt.refresh-token-expiration}")
+    private long REFRESH_TOKEN_EXPIRATION_TIME;
 
     private final Key key;
     public JwtProvider(String keyString){
@@ -25,6 +30,14 @@ public class JwtProvider {
         return TokenResponseDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken).build();
+    }
+
+    public String getClaim(String token) {
+        return (String) Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody().get("user_email");
     }
     private String genAccessToken(String claim, long now){
         return Jwts.builder()
