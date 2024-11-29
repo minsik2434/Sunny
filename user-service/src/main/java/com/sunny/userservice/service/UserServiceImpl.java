@@ -11,11 +11,7 @@ import com.sunny.userservice.dto.UserRequestDto;
 import com.sunny.userservice.dto.UserResponseDto;
 import com.sunny.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-//import org.springframework.security.core.userdetails.User;
-//import org.springframework.security.core.userdetails.UserDetails;
-//import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -65,18 +61,6 @@ public class UserServiceImpl implements UserService{
                 .profileUrl(member.getProfileUrl()).build();
 
     }
-
-//    @Override
-//    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-//        Optional<Member> optional = userRepository.findByEmail(email);
-//        if(optional.isEmpty()){
-//            throw new UsernameNotFoundException("User Not Found");
-//        }
-//        Member member = optional.get();
-//        return User.builder().username(member.getEmail())
-//                .password(member.getPassword())
-//                .roles("USER").build();
-//    }
 
 
     @Override
