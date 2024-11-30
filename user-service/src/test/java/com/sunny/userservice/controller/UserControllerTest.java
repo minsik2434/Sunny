@@ -1,6 +1,5 @@
 package com.sunny.userservice.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sunny.userservice.common.JwtProvider;
 import com.sunny.userservice.common.exception.CredentialException;
