@@ -1,14 +1,12 @@
 package com.sunny.userservice.service;
 
+import com.sunny.userservice.client.ProjectClient;
 import com.sunny.userservice.common.JwtProvider;
 import com.sunny.userservice.common.exception.CredentialException;
 import com.sunny.userservice.common.exception.DuplicateResourceException;
 import com.sunny.userservice.common.exception.ResourceNotFoundException;
 import com.sunny.userservice.domain.Member;
-import com.sunny.userservice.dto.LoginRequestDto;
-import com.sunny.userservice.dto.TokenResponseDto;
-import com.sunny.userservice.dto.UserRequestDto;
-import com.sunny.userservice.dto.UserResponseDto;
+import com.sunny.userservice.dto.*;
 import com.sunny.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -30,6 +29,7 @@ public class UserServiceImpl implements UserService{
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
     private final RedisTemplate<String,String> redisTemplate;
+    private final ProjectClient projectClient;
 
     @Value("${jwt.refresh-token-expiration}")
     private long refresh_token_expirationTime;
@@ -52,14 +52,14 @@ public class UserServiceImpl implements UserService{
             throw new ResourceNotFoundException("User Not Found");
         }
         Member member = optional.get();
-
+        List<ProjectResponseDto> projectList = projectClient.getProjectList(member.getEmail());
         return UserResponseDto.builder()
                 .id(member.getId())
                 .email(member.getEmail())
                 .name(member.getName())
                 .phoneNumber(member.getPhoneNumber())
-                .profileUrl(member.getProfileUrl()).build();
-
+                .profileUrl(member.getProfileUrl())
+                .projects(projectList).build();
     }
 
 

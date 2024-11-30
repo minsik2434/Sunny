@@ -21,4 +21,11 @@ public class ProjectMember {
 
     private String role;
 
+    public ProjectMember(Project project, String userEmail, String role){
+        this.project = project;
+        this.userEmail = userEmail;
+        this.role = role;
+        project.getProjectMembers().add(this);
+    }
+
 }
