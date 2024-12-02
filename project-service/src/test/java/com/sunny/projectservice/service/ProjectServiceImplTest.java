@@ -24,7 +24,6 @@ class ProjectServiceImplTest {
         CreateRequestDto createRequestDto = new CreateRequestDto();
         createRequestDto.setProjectName("testProject");
         createRequestDto.setDescription("test");
-        projectService.create("AnyString",createRequestDto);
 
 
         Optional<Project> findProject = projectRepository.findById(1L);

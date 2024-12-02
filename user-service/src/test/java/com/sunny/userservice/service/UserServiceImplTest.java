@@ -1,26 +1,40 @@
 package com.sunny.userservice.service;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.sunny.userservice.client.ProjectClient;
 import com.sunny.userservice.common.exception.CredentialException;
 import com.sunny.userservice.common.exception.DuplicateResourceException;
 import com.sunny.userservice.common.exception.ResourceNotFoundException;
 import com.sunny.userservice.domain.Member;
-import com.sunny.userservice.dto.LoginRequestDto;
-import com.sunny.userservice.dto.TokenResponseDto;
-import com.sunny.userservice.dto.UserRequestDto;
-import com.sunny.userservice.dto.UserResponseDto;
+import com.sunny.userservice.dto.*;
 import com.sunny.userservice.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.TestPropertySource;
+import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
+import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.List;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
+@AutoConfigureWireMock(port = 0)
 @Slf4j
+@TestPropertySource(properties = {
+        "feign-endpoint=http://localhost:${wiremock.server.port}"
+})
 class UserServiceImplTest extends TestContainerConfig{
 
     @Autowired
@@ -32,10 +46,16 @@ class UserServiceImplTest extends TestContainerConfig{
     @Autowired
     RedisTemplate<String, String> redisTemplate;
 
+    @Autowired
+    WireMockServer wireMockServer;
     UserRequestDto userRequestDto;
     LoginRequestDto loginRequestDto;
+
     @BeforeEach
-    void userInit(){
+    void initTest(){
+        wireMockServer.stop();
+        wireMockServer.start();
+
         userRequestDto = new UserRequestDto(
                 "testEmail@gmail.com",
                 "testPassword",
@@ -48,8 +68,9 @@ class UserServiceImplTest extends TestContainerConfig{
     }
 
     @AfterEach
-    void initDB(){
+    void afterTest(){
         userRepository.deleteAll();
+        wireMockServer.resetAll();
     }
 
     @Test
@@ -70,10 +91,28 @@ class UserServiceImplTest extends TestContainerConfig{
 
     @Test
     @DisplayName("회원 조회 테스트")
-    void getUserTest(){
+    void getUserTest() throws JsonProcessingException, UnsupportedEncodingException {
         userService.save(userRequestDto);
+        ObjectMapper mapper = new ObjectMapper();
+        ProjectResponseDto projectResponseDto = new ProjectResponseDto(
+                1L,
+                "testProject",
+                "test",
+                "OWNER"
+        );
+        String expectedResponse = mapper.writeValueAsString(
+                List.of(projectResponseDto)
+        );
 
         Member member = userRepository.findByEmail(userRequestDto.getEmail()).get();
+        String encodedEmail = URLEncoder.encode(userRequestDto.getEmail(), "UTF-8");
+        stubFor(get(urlEqualTo("/project/"+ encodedEmail))
+                .willReturn(aResponse()
+                        .withStatus(HttpStatus.OK.value())
+                        .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                        .withBody(expectedResponse)
+                ));
+
         UserResponseDto userResponseDto = userService.getUser(userRequestDto.getEmail());
 
         assertThat(member.getId()).isEqualTo(userResponseDto.getId());
@@ -81,7 +120,11 @@ class UserServiceImplTest extends TestContainerConfig{
         assertThat(member.getName()).isEqualTo(userResponseDto.getName());
         assertThat(member.getPhoneNumber()).isEqualTo(userResponseDto.getPhoneNumber());
         assertThat(member.getProfileUrl()).isEqualTo(userResponseDto.getProfileUrl());
-
+        assertThat(userResponseDto.getProjects().get(0).getProjectId()).isEqualTo(projectResponseDto.getProjectId());
+        assertThat(userResponseDto.getProjects().get(0).getProjectDescription())
+                .isEqualTo(projectResponseDto.getProjectDescription());
+        assertThat(userResponseDto.getProjects().get(0).getProjectName())
+                .isEqualTo(projectResponseDto.getProjectName());
     }
 
     @Test

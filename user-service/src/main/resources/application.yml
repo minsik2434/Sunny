@@ -6,11 +6,27 @@ spring:
   cloud:
     config:
       name: user-service
+    openfeign:
+      circuitbreaker:
+        enabled: true
 
   jpa:
     show-sql: true
     hibernate:
       ddl-auto: none
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 2
+        record-failure-predicate: com.sunny.userservice.client.circuitbreaker.ExceptionRecordFailurePredicate
+    instances:
+      default:
+        base-config: default
 
 eureka:
   client:
@@ -26,4 +42,6 @@ management:
   endpoints:
     web:
       exposure:
-        include: refresh
+        include: refresh, health, info, circuitbreakers
+
+feign-endpoint:
