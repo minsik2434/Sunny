@@ -6,8 +6,6 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.utility.DockerImageName;
 
 public abstract class TestContainerConfig {
-
-
     static final String REDIS_IMAGE = "redis:6-alpine";
     static final GenericContainer REDIS_CONTAINER;
 

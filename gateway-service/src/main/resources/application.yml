@@ -17,6 +17,13 @@ spring:
         - id: user-service
           uri: lb://USER-SERVICE
           predicates:
+            - Path=/user-service/user
+            - Method=POST
+          filters:
+            - StripPrefix=1
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
             - Path=/user-service/**
           filters:
             - StripPrefix=1

@@ -24,9 +24,9 @@ resilience4j:
         wait-duration-in-open-state: 10s
         permitted-number-of-calls-in-half-open-state: 2
         record-failure-predicate: com.sunny.userservice.client.circuitbreaker.ExceptionRecordFailurePredicate
-    instances:
-      default:
-        base-config: default
+#    instances:
+#      default:
+#        base-config: default
 
 eureka:
   client:
