@@ -6,10 +6,15 @@ spring:
   cloud:
     config:
       name: project-service
+
   jpa:
     show-sql: true
     hibernate:
       ddl-auto: none
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
 eureka:
   client:

@@ -1,12 +1,15 @@
 package com.sunny.projectservice.service;
 
-import com.sunny.projectservice.dto.CreateRequestDto;
-import com.sunny.projectservice.dto.ProjectResponseDto;
+import com.sunny.projectservice.dto.*;
 
 import java.util.List;
 
 public interface ProjectService {
-    void create(String accessToken, CreateRequestDto createRequestDto);
+    Long create(String accessToken, CreateRequestDto createRequestDto);
 
     List<ProjectResponseDto> getProject(String userEmail);
+
+    void invite(String accessToken, InviteRequestDto inviteRequestDto);
+
+    AcceptResponseDto acceptInvite(String accessToken, AcceptRequestDto acceptRequestDto);
 }
