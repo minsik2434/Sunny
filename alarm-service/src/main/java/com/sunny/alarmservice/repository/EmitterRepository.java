@@ -11,4 +11,11 @@ public interface EmitterRepository {
     void deleteById(String emitterId);
 
     Map<String,SseEmitter> findAllEmitterByUserEmail(String userEmail);
+    void saveEventCache(String eventCacheId, Object event);
+
+    Map<String, Object> findAllEventCacheByUserEmail(String userEmail);
+
+    void deleteAllEmitterByUserEmail(String userEmail);
+
+    void deleteAllEventCacheByUserEmail(String userEmail);
 }

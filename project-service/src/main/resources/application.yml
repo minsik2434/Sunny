@@ -6,6 +6,9 @@ spring:
   cloud:
     config:
       name: project-service
+    loadbalancer:
+      cache:
+        enabled: true
 
   jpa:
     show-sql: true

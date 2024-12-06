@@ -28,6 +28,20 @@ spring:
           filters:
             - StripPrefix=1
             - name: JwtValidationFilter
+        - id: project-service
+          uri: lb://PROJECT-SERVICE
+          predicates:
+            - Path=/project-service/**
+          filters:
+            - StripPrefix=1
+            - name: JwtValidationFilter
+        - id: alarm-service
+          uri: lb://ALARM-SERVICE
+          predicates:
+            - Path=/alarm-service/**
+          filters:
+            - StripPrefix=1
+            - name: JwtValidationFilter
 eureka:
   client:
     register-with-eureka: true

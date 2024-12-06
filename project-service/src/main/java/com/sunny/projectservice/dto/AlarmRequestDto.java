@@ -7,8 +7,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class AcceptResponseDto {
-    private String projectName;
-    private String email;
-    private String role;
+public class AlarmRequestDto {
+    private String type;
+    private String recipientEmail;
+    private Long projectId;
+    private String content;
 }

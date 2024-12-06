@@ -13,8 +13,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +33,7 @@ public class ProjectServiceImpl implements ProjectService{
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
     private final JwtUtil jwtUtil;
+    private final WebClient.Builder webClientBuilder;
     private final RedisTemplate<String, String> redisTemplate;
     @Override
     @Transactional
@@ -72,7 +76,9 @@ public class ProjectServiceImpl implements ProjectService{
         String inviteCode = UUID.randomUUID().toString();
         ValueOperations<String, String> vop = redisTemplate.opsForValue();
         log.info("{}",inviteCode);
+        AlarmRequestDto alarmRequestDto = new AlarmRequestDto("invite", toInviteEmail,projectId, inviteCode);
 
+        sendAlarm(alarmRequestDto).subscribe();
         vop.set(projectId+":"+toInviteEmail, inviteCode, 600000 ,TimeUnit.MILLISECONDS);
     }
 
@@ -96,11 +102,24 @@ public class ProjectServiceImpl implements ProjectService{
         ProjectMember projectMember = new ProjectMember(project, toInviteEmail, "MEMBER");
         ProjectMember joinedMember = projectMemberRepository.save(projectMember);
 
-        AcceptResponseDto acceptResponseDto = new AcceptResponseDto();
-        acceptResponseDto.setEmail(joinedMember.getUserEmail());
-        acceptResponseDto.setProjectName(project.getName());
-        acceptResponseDto.setRole(joinedMember.getRole());
-        return acceptResponseDto;
+        return new AcceptResponseDto(project.getName(), joinedMember.getUserEmail() ,joinedMember.getRole());
     }
 
+    private Mono<Void> sendAlarm(AlarmRequestDto alarmRequestDto){
+        return webClientBuilder
+                .build()
+                .post()
+                .uri("lb://ALARM-SERVICE/alarm")
+                .bodyValue(alarmRequestDto)
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, response ->{
+                    log.error("Client ErrorResponse {}",response.statusCode());
+                    return Mono.error(new RuntimeException("client Error"));
+                })
+                .onStatus(HttpStatusCode::is5xxServerError, response ->{
+                    log.error("Client ErrorResponse {}",response.statusCode());
+                    return Mono.error(new RuntimeException("server Error"));
+                })
+                .bodyToMono(Void.class);
+    }
 }

@@ -1,17 +1,18 @@
 package com.sunny.alarmservice.controller;
 
+import com.sunny.alarmservice.dto.AlarmRequestDto;
 import com.sunny.alarmservice.service.AlarmService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class AlarmController {
 
     private final AlarmService alarmService;
@@ -25,9 +26,13 @@ public class AlarmController {
         return ResponseEntity.ok(emitter);
     }
 
-    @GetMapping("/test")
-    public ResponseEntity<Void> notification(){
-        alarmService.send("test@naver.com","data");
+    @PostMapping("/alarm")
+    public ResponseEntity<Void> alarm(@RequestBody AlarmRequestDto alarmRequestDto){
+        log.info("alarm 호출");
+        alarmService.send(alarmRequestDto.getRecipientEmail(),
+                alarmRequestDto.getType(),
+                alarmRequestDto.getContent(),
+                alarmRequestDto.getProjectId());
         return ResponseEntity.ok().build();
     }
 }
