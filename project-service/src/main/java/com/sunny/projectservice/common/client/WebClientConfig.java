@@ -1,4 +1,4 @@
-package com.sunny.projectservice.common;
+package com.sunny.projectservice.common.client;
 
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;

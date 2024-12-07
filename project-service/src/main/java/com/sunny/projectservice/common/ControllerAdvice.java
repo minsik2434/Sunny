@@ -4,6 +4,7 @@ import com.sunny.projectservice.dto.FailResponse;
 import com.sunny.projectservice.exception.AuthorizationException;
 import com.sunny.projectservice.exception.DuplicateResourceException;
 import com.sunny.projectservice.exception.ResourceNotFoundException;
+import com.sunny.projectservice.exception.ServiceUnavailable;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +33,14 @@ public class ControllerAdvice {
                 ex.getMessage(), request.getRequestURI());
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(failResponse);
+    }
+
+    @ExceptionHandler(ServiceUnavailable.class)
+    public ResponseEntity<FailResponse> serviceUnavailable(ServiceUnavailable ex,
+                                                           HttpServletRequest request){
+        FailResponse failResponse = createFailResponse(HttpStatus.SERVICE_UNAVAILABLE, "Service Unavailable",
+                ex.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(failResponse);
     }
 
     @ExceptionHandler(AuthorizationException.class)

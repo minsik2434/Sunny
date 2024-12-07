@@ -1,5 +1,6 @@
 package com.sunny.userservice.controller;
 
+import com.sunny.userservice.common.exception.ResourceNotFoundException;
 import com.sunny.userservice.dto.LoginRequestDto;
 import com.sunny.userservice.dto.TokenResponseDto;
 import com.sunny.userservice.dto.UserRequestDto;
@@ -30,6 +31,15 @@ public class UserController {
         return ResponseEntity.ok(userResponseDto);
     }
 
+    @GetMapping("/user/{userEmail}/exist")
+    public ResponseEntity<Void> exist(@PathVariable String userEmail){
+        boolean exist = userService.exist(userEmail);
+        if(!exist){
+            throw new ResourceNotFoundException("User Not Found");
+        }
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/login")
     public ResponseEntity<TokenResponseDto> login(@RequestBody LoginRequestDto loginRequestDto){
         TokenResponseDto token = userService.login(loginRequestDto);
@@ -37,7 +47,7 @@ public class UserController {
     }
 
     @GetMapping("/logout/{userEmail}")
-    public ResponseEntity<UserResponseDto> logout(@PathVariable String userEmail){
+    public ResponseEntity<Void> logout(@PathVariable String userEmail){
         userService.logout(userEmail);
         return ResponseEntity.noContent().build();
     }

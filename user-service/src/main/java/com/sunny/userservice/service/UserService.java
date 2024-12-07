@@ -13,5 +13,6 @@ public interface UserService {
     TokenResponseDto login(LoginRequestDto loginRequestDto);
     void logout(String email);
 
+    boolean exist(String userEmail);
     TokenResponseDto refresh(String refreshToken);
 }

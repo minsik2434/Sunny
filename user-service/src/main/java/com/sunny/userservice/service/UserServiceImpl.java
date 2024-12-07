@@ -88,6 +88,12 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    public boolean exist(String userEmail) {
+        Optional<Member> user = userRepository.findByEmail(userEmail);
+        return user.isPresent();
+    }
+
+    @Override
     public TokenResponseDto refresh(String refreshToken) {
         String email = jwtProvider.getClaim(refreshToken);
         ValueOperations<String, String> vop = redisTemplate.opsForValue();

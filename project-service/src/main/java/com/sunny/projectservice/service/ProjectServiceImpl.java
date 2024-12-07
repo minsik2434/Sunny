@@ -1,6 +1,7 @@
 package com.sunny.projectservice.service;
 
 import com.sunny.projectservice.common.JwtUtil;
+import com.sunny.projectservice.common.client.UserClient;
 import com.sunny.projectservice.domain.Project;
 import com.sunny.projectservice.domain.ProjectMember;
 import com.sunny.projectservice.dto.*;
@@ -35,6 +36,7 @@ public class ProjectServiceImpl implements ProjectService{
     private final JwtUtil jwtUtil;
     private final WebClient.Builder webClientBuilder;
     private final RedisTemplate<String, String> redisTemplate;
+    private final UserClient userClient;
     @Override
     @Transactional
     public Long create(String accessToken, CreateRequestDto createRequestDto) {
@@ -67,6 +69,9 @@ public class ProjectServiceImpl implements ProjectService{
             throw new AuthorizationException("lack of permission");
         }
         String toInviteEmail = inviteRequestDto.getToInviteEmail();
+
+        userClient.userExist(toInviteEmail);
+
         Long projectId = inviteRequestDto.getProjectId();
         Optional<ProjectMember> toInvite = projectMemberRepository.findByProjectIdAndUserEmail(projectId, toInviteEmail);
         if (toInvite.isPresent()){
