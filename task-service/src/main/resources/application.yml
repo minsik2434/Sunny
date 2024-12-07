@@ -1,0 +1,21 @@
+server:
+  port: 0
+spring:
+  application:
+    name: task-service
+  config:
+    import: optional:configserver:http://localhost:8888
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    instance-id: ${spring.application.name}:${vcap.application.instance_id:${spring.application.instance_id:${random.value}}}
