@@ -36,16 +36,16 @@ public class ControllerAdvice {
     }
 
     @ExceptionHandler(ServiceUnavailable.class)
-    public ResponseEntity<FailResponse> serviceUnavailable(ServiceUnavailable ex,
-                                                           HttpServletRequest request){
+    public ResponseEntity<FailResponse> serviceUnavailableExceptionResponse(ServiceUnavailable ex,
+                                                                            HttpServletRequest request){
         FailResponse failResponse = createFailResponse(HttpStatus.SERVICE_UNAVAILABLE, "Service Unavailable",
                 ex.getMessage(), request.getRequestURI());
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(failResponse);
     }
 
     @ExceptionHandler(AuthorizationException.class)
-    public ResponseEntity<FailResponse> lackOfPermission(AuthorizationException ex,
-                                                         HttpServletRequest request){
+    public ResponseEntity<FailResponse> lackOfPermissionExceptionResponse(AuthorizationException ex,
+                                                                          HttpServletRequest request){
         FailResponse failResponse = createFailResponse(HttpStatus.UNAUTHORIZED,"UnAuthorization",
                 ex.getMessage(), request.getRequestURI());
 

@@ -105,10 +105,9 @@ class ProjectControllerTest {
         acceptRequestDto.setInviteCode("inviteCode");
         String requestBody = mapper.writeValueAsString(acceptRequestDto);
 
-        AcceptResponseDto acceptResponseDto = new AcceptResponseDto();
-        acceptResponseDto.setProjectName("test");
-        acceptResponseDto.setEmail("testEmail@naver.com");
-        acceptResponseDto.setRole("MEMBER");
+        AcceptResponseDto acceptResponseDto = new AcceptResponseDto("test",
+                "testEmail@naver.com",
+                "MEMBER");
 
         when(projectService.acceptInvite(anyString(),any(AcceptRequestDto.class))).thenReturn(acceptResponseDto);
 
