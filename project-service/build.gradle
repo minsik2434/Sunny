@@ -54,6 +54,7 @@ dependencies {
     testImplementation 'org.testcontainers:testcontainers:1.19.3'
     testImplementation 'org.testcontainers:junit-jupiter:1.19.3'
     testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+    testImplementation 'org.springframework.cloud:spring-cloud-contract-wiremock'
 }
 
 dependencyManagement {

@@ -1,6 +1,5 @@
-package com.sunny.projectservice.dto;
+package com.sunny.taskservice.dto;
 
-import com.sunny.projectservice.domain.ProjectMember;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

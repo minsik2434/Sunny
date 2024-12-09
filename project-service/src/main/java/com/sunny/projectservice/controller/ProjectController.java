@@ -40,11 +40,17 @@ public class ProjectController {
         return ResponseEntity.ok(inviteResponseDto);
     }
 
-    @PostMapping("/invite/accept")
+    @PostMapping("/inviteAccept")
     public ResponseEntity<AcceptResponseDto> acceptInvite(@RequestHeader("Authorization") String token,
                                              @RequestBody AcceptRequestDto acceptRequestDto){
         String accessToken = token.replace("Bearer ", "");
         AcceptResponseDto acceptResponseDto = projectService.acceptInvite(accessToken, acceptRequestDto);
         return ResponseEntity.ok(acceptResponseDto);
+    }
+
+    @GetMapping("/project/{projectId}/members")
+    public ResponseEntity<ProjectMemberDto> projectMember(@PathVariable Long projectId, @RequestParam(value = "email") String email){
+        ProjectMemberDto projectMember = projectService.getProjectMember(projectId, email);
+        return ResponseEntity.ok(projectMember);
     }
 }

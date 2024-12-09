@@ -12,4 +12,6 @@ public interface ProjectService {
     void invite(String accessToken, InviteRequestDto inviteRequestDto);
 
     AcceptResponseDto acceptInvite(String accessToken, AcceptRequestDto acceptRequestDto);
+
+    ProjectMemberDto getProjectMember(Long projectId, String userEmail);
 }

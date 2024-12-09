@@ -11,6 +11,8 @@ spring:
     hibernate:
       ddl-auto: none
 
+feign-endpoint:
+
 eureka:
   client:
     register-with-eureka: true

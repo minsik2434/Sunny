@@ -1,4 +1,4 @@
-package com.sunny.projectservice.common;
+package com.sunny.taskservice.common;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;

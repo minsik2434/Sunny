@@ -1,7 +1,7 @@
 package com.sunny.projectservice.common;
 
 import com.sunny.projectservice.dto.FailResponse;
-import com.sunny.projectservice.exception.AuthorizationException;
+import com.sunny.projectservice.exception.PermissionException;
 import com.sunny.projectservice.exception.DuplicateResourceException;
 import com.sunny.projectservice.exception.ResourceNotFoundException;
 import com.sunny.projectservice.exception.ServiceUnavailable;
@@ -43,8 +43,8 @@ public class ControllerAdvice {
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(failResponse);
     }
 
-    @ExceptionHandler(AuthorizationException.class)
-    public ResponseEntity<FailResponse> lackOfPermissionExceptionResponse(AuthorizationException ex,
+    @ExceptionHandler(PermissionException.class)
+    public ResponseEntity<FailResponse> lackOfPermissionExceptionResponse(PermissionException ex,
                                                                           HttpServletRequest request){
         FailResponse failResponse = createFailResponse(HttpStatus.UNAUTHORIZED,"UnAuthorization",
                 ex.getMessage(), request.getRequestURI());

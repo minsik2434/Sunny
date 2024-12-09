@@ -5,7 +5,7 @@ import com.sunny.projectservice.common.client.UserClient;
 import com.sunny.projectservice.domain.Project;
 import com.sunny.projectservice.domain.ProjectMember;
 import com.sunny.projectservice.dto.*;
-import com.sunny.projectservice.exception.AuthorizationException;
+import com.sunny.projectservice.exception.PermissionException;
 import com.sunny.projectservice.exception.DuplicateResourceException;
 import com.sunny.projectservice.exception.ResourceNotFoundException;
 import com.sunny.projectservice.repository.ProjectMemberRepository;
@@ -66,7 +66,7 @@ public class ProjectServiceImpl implements ProjectService{
             throw new ResourceNotFoundException("Not Found Member");
         }
         if(!(fromInvite.get().getRole().equals("OWNER") || fromInvite.get().getRole().equals("ADMIN"))){
-            throw new AuthorizationException("lack of permission");
+            throw new PermissionException("lack of permission");
         }
         String toInviteEmail = inviteRequestDto.getToInviteEmail();
 
@@ -108,6 +108,21 @@ public class ProjectServiceImpl implements ProjectService{
         ProjectMember joinedMember = projectMemberRepository.save(projectMember);
 
         return new AcceptResponseDto(project.getName(), joinedMember.getUserEmail() ,joinedMember.getRole());
+    }
+
+    @Override
+    public ProjectMemberDto getProjectMember(Long projectId, String userEmail) {
+        Optional<ProjectMember> optional = projectMemberRepository.findByProjectIdAndUserEmail(projectId, userEmail);
+        if(optional.isEmpty()){
+            throw new ResourceNotFoundException("Cannot find users belonging to project");
+        }
+        ProjectMember projectMember = optional.get();
+
+        return new ProjectMemberDto(
+                projectMember.getProject().getId(),
+                projectMember.getUserEmail(),
+                projectMember.getRole()
+        );
     }
 
     private Mono<Void> sendAlarm(AlarmRequestDto alarmRequestDto){
