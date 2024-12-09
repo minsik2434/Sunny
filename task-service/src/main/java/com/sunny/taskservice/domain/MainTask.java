@@ -1,16 +1,15 @@
 package com.sunny.taskservice.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -24,6 +23,9 @@ public class MainTask {
     private LocalDateTime startDate;
     private LocalDateTime deadline;
     private Long projectId;
+
+    @OneToMany(mappedBy = "mainTask", orphanRemoval = true)
+    private List<SubTask> subTaskList = new ArrayList<>();
 
     public MainTask(String name, String description, LocalDateTime startDate, LocalDateTime deadLine, Long projectId){
         this.name = name;

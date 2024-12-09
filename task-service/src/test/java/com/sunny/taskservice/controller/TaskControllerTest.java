@@ -1,6 +1,8 @@
 package com.sunny.taskservice.controller;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.sunny.taskservice.dto.CreateSubTaskRequestDto;
 import com.sunny.taskservice.exception.ServiceUnavailable;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sunny.taskservice.common.ControllerAdvice;
@@ -19,7 +21,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -46,7 +50,7 @@ class TaskControllerTest {
 
     @Test
     @DisplayName("작업 저장 테스트")
-    void createTaskTest() throws Exception {
+    void createMainTaskTest() throws Exception {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date start = new Date(System.currentTimeMillis());
         Date end = new Date(System.currentTimeMillis()+100);
@@ -69,8 +73,8 @@ class TaskControllerTest {
     }
 
     @Test
-    @DisplayName("작업 저장 테스트-Datetime 포맷 오류")
-    void createTaskTest_InvalidDateTimeFormat() throws Exception {
+    @DisplayName("메인 작업 저장 테스트-Datetime 포맷 오류")
+    void createMainTaskTest_InvalidDateTimeFormat() throws Exception {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
         Date start = new Date(System.currentTimeMillis());
         Date end = new Date(System.currentTimeMillis()+100);
@@ -94,8 +98,8 @@ class TaskControllerTest {
     }
 
     @Test
-    @DisplayName("작업 저장 테스트-Datetime 포맷 오류")
-    void createTaskTest_InvalidStartAndDeadLine() throws Exception {
+    @DisplayName("메인 작업 저장 테스트-Datetime 포맷 오류")
+    void createMainTaskTest_InvalidStartAndDeadLine() throws Exception {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date start = new Date(System.currentTimeMillis());
         Date end = new Date(System.currentTimeMillis()-10000);
@@ -119,8 +123,8 @@ class TaskControllerTest {
     }
 
     @Test
-    @DisplayName("작업 저장 테스트-프로젝트 회원 찾지못함")
-    void createTaskTest_NotFoundProjectMember() throws Exception {
+    @DisplayName("메인 작업 저장 테스트-프로젝트 회원 찾지못함")
+    void createMainTaskTest_NotFoundProjectMember() throws Exception {
         doThrow(new ResourceNotFoundException("Cannot find users belonging to project"))
                 .when(taskService).mainTaskSave(anyString(), any(CreateMainTaskRequestDto.class));
 
@@ -147,8 +151,8 @@ class TaskControllerTest {
     }
 
     @Test
-    @DisplayName("작업 저장 테스트-프로젝트 클라이언트 오류")
-    void createTaskTest_ServiceUnavailable() throws Exception {
+    @DisplayName("메인 작업 저장 테스트-프로젝트 클라이언트 오류")
+    void createMainTaskTest_ServiceUnavailable() throws Exception {
         doThrow(new ServiceUnavailable("Unavailable ProjectService"))
                 .when(taskService).mainTaskSave(anyString(),any(CreateMainTaskRequestDto.class));
 
@@ -172,5 +176,30 @@ class TaskControllerTest {
                         .content(content))
                 .andExpect(status().isServiceUnavailable())
                 .andExpect(jsonPath("$.error").value("Service Unavailable"));
+    }
+
+    @Test
+    @DisplayName("서브 작업 저장 테스트")
+    void createSubTaskTest() throws Exception {
+        List<String> memberList = new ArrayList<>();
+        memberList.add("testEmail@naver.com");
+        memberList.add("testEmail2@naver.com");
+        CreateSubTaskRequestDto createSubTaskRequestDto = new CreateSubTaskRequestDto(
+                1L,
+                1L,
+                "SubTask1",
+                "it is subtask1",
+                "Waiting",
+                memberList
+        );
+
+        String content = mapper.writeValueAsString(createSubTaskRequestDto);
+
+        mockMvc.perform(post("/subTask")
+                .contentType("application/json")
+                .header("Authorization", "testToken")
+                .content(content))
+                .andExpect(status().isCreated());
+
     }
 }

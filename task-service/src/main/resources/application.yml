@@ -3,13 +3,27 @@ server:
 spring:
   application:
     name: task-service
-  config:
-    import: optional:configserver:http://localhost:8888
-
   jpa:
     show-sql: true
     hibernate:
       ddl-auto: none
+
+  config:
+    import: optional:configserver:http://localhost:8888
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 2
+        record-failure-predicate: com.sunny.taskservice.common.client.circuitbreaker.ExceptionRecordFailurePredicate
 
 feign-endpoint:
 
