@@ -1,14 +1,14 @@
 package com.sunny.taskservice.controller;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.sunny.taskservice.dto.CreateSubTaskRequestDto;
-import com.sunny.taskservice.exception.ServiceUnavailable;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sunny.taskservice.common.ControllerAdvice;
+import com.sunny.taskservice.dto.AssignMemberRequestDto;
 import com.sunny.taskservice.dto.CreateMainTaskRequestDto;
-import com.sunny.taskservice.service.TaskService;
+import com.sunny.taskservice.dto.CreateSubTaskRequestDto;
 import com.sunny.taskservice.exception.ResourceNotFoundException;
+import com.sunny.taskservice.exception.ServiceUnavailable;
+import com.sunny.taskservice.service.TaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,7 +27,8 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -192,14 +193,53 @@ class TaskControllerTest {
                 "Waiting",
                 memberList
         );
-
         String content = mapper.writeValueAsString(createSubTaskRequestDto);
-
         mockMvc.perform(post("/subTask")
                 .contentType("application/json")
                 .header("Authorization", "testToken")
                 .content(content))
                 .andExpect(status().isCreated());
+    }
 
+    @Test
+    @DisplayName("작업 할당 테스트")
+    void addAssignMemberTest() throws Exception {
+        List<String> assignMemberEmails = new ArrayList<>();
+        assignMemberEmails.add("testEmail@naver.com");
+        assignMemberEmails.add("testEmail2@naver.com");
+
+        AssignMemberRequestDto assignMemberRequestDto = new AssignMemberRequestDto(
+                1L,
+                assignMemberEmails
+        );
+
+        String content = mapper.writeValueAsString(assignMemberRequestDto);
+        mockMvc.perform(post("/subTask/1/addMember")
+                        .contentType("application/json")
+                        .header("Authorization", "testToken")
+                        .content(content))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    @DisplayName("작업 할당 테스트 - 동일한 이메일 존재시")
+    void addAssignMemberTest_DuplicateEmail() throws Exception {
+        List<String> assignMemberEmails = new ArrayList<>();
+        assignMemberEmails.add("testEmail@naver.com");
+        assignMemberEmails.add("testEmail@naver.com");
+
+        AssignMemberRequestDto assignMemberRequestDto = new AssignMemberRequestDto(
+                1L,
+                assignMemberEmails
+        );
+
+        String content = mapper.writeValueAsString(assignMemberRequestDto);
+        mockMvc.perform(post("/subTask/1/addMember")
+                        .contentType("application/json")
+                        .header("Authorization", "testToken")
+                        .content(content))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Validation Error"))
+                .andExpect(jsonPath("$.message").value("{assignMembers=Elements of this Collection must not be duplicated}"));
     }
 }

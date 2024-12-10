@@ -12,16 +12,9 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
-public class CreateSubTaskRequestDto {
-    private Long projectId;
+public class AssignMemberRequestDto {
     @NotNull
-    private Long mainTaskId;
-    @NotBlank
-    private String title;
-    @NotBlank
-    private String description;
-    @NotBlank
-    private String status;
+    private Long projectId;
     @UniqueElements
     private List<String> assignedMembers;
 }
