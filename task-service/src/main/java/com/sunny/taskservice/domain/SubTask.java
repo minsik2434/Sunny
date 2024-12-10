@@ -1,6 +1,5 @@
 package com.sunny.taskservice.domain;
 
-import com.sunny.taskservice.dto.CreateSubTaskRequestDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

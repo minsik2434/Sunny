@@ -240,6 +240,6 @@ class TaskControllerTest {
                         .content(content))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("Validation Error"))
-                .andExpect(jsonPath("$.message").value("{assignMembers=Elements of this Collection must not be duplicated}"));
+                .andExpect(jsonPath("$.message").value("{assignedMembers=Elements of this Collection must not be duplicated}"));
     }
 }

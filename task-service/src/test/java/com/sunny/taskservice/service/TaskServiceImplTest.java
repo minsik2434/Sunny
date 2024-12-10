@@ -67,8 +67,6 @@ class TaskServiceImplTest {
 
     CreateMainTaskRequestDto createMainTaskRequestDto;
 
-    CreateSubTaskRequestDto createSubTaskRequestDto;
-
     ObjectMapper mapper = new ObjectMapper();
     @BeforeEach
     void initTest(){
@@ -80,14 +78,6 @@ class TaskServiceImplTest {
                 "2024-12-30 12:20:30"
         );
 
-        createSubTaskRequestDto = new CreateSubTaskRequestDto(
-                1L,
-                1L,
-                "SubTask1",
-                "SubTaskDescription",
-                "Waiting",
-                new ArrayList<>()
-        );
         wireMockServer.stop();
         wireMockServer.start();
     }
@@ -184,7 +174,16 @@ class TaskServiceImplTest {
                 LocalDateTime.parse("2024-05-03 12:20:30",formatter),
                 1L
         );
-        mainTaskRepository.save(mainTask);
+        MainTask savedMainTask = mainTaskRepository.save(mainTask);
+
+        CreateSubTaskRequestDto createSubTaskRequestDto = new CreateSubTaskRequestDto(
+                1L,
+                savedMainTask.getId(),
+                "SubTask1",
+                "SubTaskDescription",
+                "Waiting",
+                new ArrayList<>()
+        );
         createSubTaskRequestDto.getAssignedMembers().add("testEmail@naver.com");
         createSubTaskRequestDto.getAssignedMembers().add("testEmail2@naver.com");
 
