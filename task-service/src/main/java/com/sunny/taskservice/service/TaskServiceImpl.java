@@ -6,18 +6,19 @@ import com.sunny.taskservice.domain.MainTask;
 import com.sunny.taskservice.domain.Role;
 import com.sunny.taskservice.domain.SubTask;
 import com.sunny.taskservice.domain.TaskMember;
-import com.sunny.taskservice.dto.AssignMemberRequestDto;
-import com.sunny.taskservice.dto.CreateMainTaskRequestDto;
-import com.sunny.taskservice.dto.CreateSubTaskRequestDto;
-import com.sunny.taskservice.dto.ProjectMemberDto;
+import com.sunny.taskservice.dto.*;
+import com.sunny.taskservice.exception.DuplicateResourceException;
 import com.sunny.taskservice.exception.PermissionException;
 import com.sunny.taskservice.exception.ResourceNotFoundException;
 import com.sunny.taskservice.repository.MainTaskRepository;
 import com.sunny.taskservice.repository.SubTaskRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -35,6 +36,7 @@ public class TaskServiceImpl implements TaskService{
     private final MainTaskRepository mainTaskRepository;
     private final SubTaskRepository subTaskRepository;
     private final ProjectClient projectClient;
+    private final WebClient.Builder webClientBuilder;
     private final JwtUtil jwtUtil;
     private static final String DATE_TIME_PATTERN = "yyy-MM-dd HH:mm:ss";
     @Override
@@ -80,6 +82,20 @@ public class TaskServiceImpl implements TaskService{
             createTaskMember(assignedMembers, createSubTaskRequestDto.getProjectId(), subTask);
         }
         SubTask savedSubTask = subTaskRepository.save(subTask);
+        if(isExistAssignMembers(createSubTaskRequestDto)){
+            createSubTaskRequestDto.getAssignedMembers()
+                            .forEach(
+                                    member -> {
+                                        AlarmRequestDto alarmRequestDto = new AlarmRequestDto(
+                                                "assigned",
+                                                member,
+                                                projectId,
+                                                "allocated to task "+savedSubTask.getId()+" of project " +projectId
+                                        );
+                                        sendAlarm(alarmRequestDto).subscribe();
+                                    }
+                            );
+        }
         return savedSubTask.getId();
     }
 
@@ -92,7 +108,45 @@ public class TaskServiceImpl implements TaskService{
         Optional<SubTask> optional = subTaskRepository.findById(subTaskId);
         SubTask subTask = emptyThrowResourceNotFoundException(optional, "SubTask Not Found");
         List<String> assignMembers = assignMemberRequestDto.getAssignedMembers();
+
+        subTask.getTaskMemberList().stream()
+                        .map(TaskMember::getEmail)
+                                .filter(assignMembers::contains)
+                                        .findFirst()
+                                                .ifPresent(email ->{
+                                                    throw new DuplicateResourceException("Exist Member");
+                                                });
+        assignMembers.forEach(
+                member -> {
+                    AlarmRequestDto alarmRequestDto = new AlarmRequestDto(
+                            "assigned",
+                            member,
+                            projectId,
+                            "allocated to task "+subTaskId+" of project " +projectId
+                    );
+                    sendAlarm(alarmRequestDto).subscribe();
+                }
+        );
+
         createTaskMember(assignMembers, projectId, subTask);
+    }
+
+    private Mono<Void> sendAlarm(AlarmRequestDto alarmRequestDto){
+        return webClientBuilder
+                .build()
+                .post()
+                .uri("lb://ALARM-SERVICE/alarm")
+                .bodyValue(alarmRequestDto)
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, response ->{
+                    log.error("Client ErrorResponse {}",response.statusCode());
+                    return Mono.error(new RuntimeException("client Error"));
+                })
+                .onStatus(HttpStatusCode::is5xxServerError, response ->{
+                    log.error("Client ErrorResponse {}",response.statusCode());
+                    return Mono.error(new RuntimeException("server Error"));
+                })
+                .bodyToMono(Void.class);
     }
 
     private boolean isExistAssignMembers(CreateSubTaskRequestDto createSubTaskRequestDto) {

@@ -245,6 +245,44 @@ class TaskServiceImplTest {
 
     }
 
+    @Test
+    @DisplayName("작업 할당 테스트 - 이미 작업에 포함되어있는 멤버를 추가하는 경우")
+    void addAssignedMemberTest_ExistMember() throws UnsupportedEncodingException, JsonProcessingException {
+        MainTask mainTask = new MainTask(
+                "MainTask",
+                "MainTaskDescription",
+                LocalDateTime.parse("2024-05-02 12:20:30",formatter),
+                LocalDateTime.parse("2024-05-03 12:20:30",formatter),
+                testProjectId
+        );
+        MainTask savedMainTask = mainTaskRepository.save(mainTask);
+        SubTask subTask = new SubTask(
+                savedMainTask,
+                "SubTask1",
+                "SubTask",
+                "Waiting"
+        );
+        TaskMember taskMember = new TaskMember(
+                requestUserEmail,
+                subTask
+        );
+        SubTask savedSubTask = subTaskRepository.save(subTask);
+
+        List<String> assignedMembers = new ArrayList<>();
+        assignedMembers.add(requestUserEmail);
+        assignedMembers.add("testEmail2@naver.com");
+        AssignMemberRequestDto assignMemberRequestDto = new AssignMemberRequestDto(
+                testProjectId,
+                assignedMembers
+        );
+
+        when(jwtUtil.getClaim(anyString())).thenReturn(requestUserEmail);
+        ProjectMemberDto projectMemberReturnObject = createProjectMemberReturnObject(testProjectId, requestUserEmail, OWNER);
+        createProjectMemberStub(testProjectId, requestUserEmail, HttpStatus.OK,projectMemberReturnObject);
+        assertThatThrownBy(() -> taskService.addAssignMember("testToken", savedSubTask.getId(), assignMemberRequestDto))
+                .message().isEqualTo("Exist Member");
+    }
+
     private void createProjectMemberStub(Long projectId, String email, HttpStatus returnStatus, Object returnObject) throws JsonProcessingException, UnsupportedEncodingException {
         String encodedEmail = URLEncoder.encode(email, "UTF-8");
         stubFor(get("/project/"+ projectId + "/members?email=" + encodedEmail)

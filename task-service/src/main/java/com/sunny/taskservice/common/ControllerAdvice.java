@@ -1,6 +1,7 @@
 package com.sunny.taskservice.common;
 
 import com.sunny.taskservice.dto.FailResponse;
+import com.sunny.taskservice.exception.DuplicateResourceException;
 import com.sunny.taskservice.exception.ResourceNotFoundException;
 import com.sunny.taskservice.exception.ServiceUnavailable;
 import jakarta.servlet.http.HttpServletRequest;
@@ -53,6 +54,15 @@ public class ControllerAdvice {
                 "Service Unavailable", ex.getMessage(), request.getRequestURI());
 
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(serviceUnavailable);
+    }
+
+    @ExceptionHandler(DuplicateResourceException.class)
+    public ResponseEntity<FailResponse> duplicateExceptionResponse(DuplicateResourceException ex,
+                                                                   HttpServletRequest request){
+        FailResponse failResponse = createFailResponse(HttpStatus.CONFLICT,
+                "Resource Duplicate", ex.getMessage(), request.getRequestURI());
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(failResponse);
     }
 
     private FailResponse createFailResponse(HttpStatus status, String error, String message, String requestUrl){
